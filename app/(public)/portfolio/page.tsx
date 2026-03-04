@@ -7,19 +7,17 @@ export const metadata: Metadata = {
     description: "View the photography and videography portfolio of RM Media Group JA.",
 };
 
-const CATEGORIES = ["All", "Weddings", "Portraits", "Corporate", "Videography", "Commercial"];
-
 const PORTFOLIO_ITEMS = [
-    { src: "https://images-pw.pixieset.com/site/gley00/yQAy6Z/DSCF2058_e1baadd3_2048.jpg", alt: "Photography is Poetry", category: "Weddings", span: "col-span-2 row-span-2" },
-    { src: "https://images-pw.pixieset.com/site/gley00/RmZpkj/DSCF3720_ec08a69b_2048.jpg", alt: "Capturing Moments", category: "Weddings", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/5wRQ8j/DSCF2168_4361a427_2048.jpg", alt: "Editorial Portrait", category: "Portraits", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/LVO8vk/5f292c2483c306060c487f9e5792aa12_0fe73901_2048.JPG", alt: "Lifestyle Beauty", category: "Commercial", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/baXAGz/1713844791402_515c6beb_2048.jpg", alt: "Studio Portrait", category: "Portraits", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/q8Ao74/DSCF1660_748f36ba_2048.jpg", alt: "Creative Campaigns", category: "Commercial", span: "col-span-2" },
-    { src: "https://images-pw.pixieset.com/site/gley00/baXAy8/1713891797477_dda9b5a5_2048.jpg", alt: "Event Coverage", category: "Commercial", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/5ylE7p/DSC_0042_030f432c_2048.jpg", alt: "Commercial Videography", category: "Videography", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/xk4X5P/DSC_0075_f1b8c1df_2048.jpg", alt: "Product Photography", category: "Commercial", span: "" },
-    { src: "https://images-pw.pixieset.com/site/gley00/ZOoR3p/DSC_0143_fc9b7ee7_2048.jpg", alt: "Brand Campaigns", category: "Videography", span: "col-span-2" },
+    { src: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1200&auto=format&fit=crop&q=80", alt: "Cinematic Wedding", category: "Weddings", span: "col-span-2 row-span-2" },
+    { src: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&auto=format&fit=crop&q=80", alt: "Editorial Portrait", category: "Portraits", span: "" },
+    { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80", alt: "Luxury Wedding", category: "Weddings", span: "" },
+    { src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&auto=format&fit=crop&q=80", alt: "Destination Wedding", category: "Weddings", span: "" },
+    { src: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1200&auto=format&fit=crop&q=80", alt: "Wedding Reception", category: "Events", span: "col-span-2" },
+    { src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80", alt: "Fashion Portrait", category: "Portraits", span: "" },
+    { src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=800&auto=format&fit=crop&q=80", alt: "Event Coverage", category: "Events", span: "" },
+    { src: "https://images.unsplash.com/photo-1551854838-212c50b4c184?w=800&auto=format&fit=crop&q=80", alt: "Brand Campaign", category: "Commercial", span: "" },
+    { src: "https://images.unsplash.com/photo-1617347454431-f49d7ff5c3b1?w=800&auto=format&fit=crop&q=80", alt: "Product Photography", category: "Commercial", span: "" },
+    { src: "https://images.unsplash.com/photo-1582128582959-b80f8c5e5a77?w=1200&auto=format&fit=crop&q=80", alt: "Corporate Videography", category: "Videography", span: "col-span-2" },
 ];
 
 export default function PortfolioPage() {
@@ -44,7 +42,7 @@ export default function PortfolioPage() {
             {/* Gallery Grid */}
             <section className="pb-32 max-w-7xl mx-auto px-6 lg:px-12">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 auto-rows-[220px]">
-                    {PORTFOLIO_ITEMS.map((work: any, i: number) => (
+                    {PORTFOLIO_ITEMS.map((work, i) => (
                         <div
                             key={i}
                             className={`relative overflow-hidden group cursor-pointer ${work.span}`}
@@ -52,7 +50,6 @@ export default function PortfolioPage() {
                             <img
                                 src={work.src}
                                 alt={work.alt}
-                                referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100">

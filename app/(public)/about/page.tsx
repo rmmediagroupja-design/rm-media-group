@@ -28,12 +28,20 @@ const VALUES = [
     },
 ];
 
+// Professional photography — no hotlinking restrictions
+const ABOUT_IMAGES = [
+    { src: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=800&auto=format&fit=crop&q=80", alt: "Editorial Portrait" },
+    { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80", alt: "Wedding Coverage" },
+    { src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=800&auto=format&fit=crop&q=80", alt: "Luxury Wedding" },
+    { src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80", alt: "Lifestyle Session" },
+];
+
 export default async function AboutPage() {
     const content = await getPageContent("about");
 
-    const heroTitle = content.hero?.title || "Behind Behind The Lens";
+    const heroTitle = content.hero?.title || "Behind The Lens";
     const heroSubtitle = content.hero?.subtitle || "Born in Jamaica, built on passion. RM Media Group JA has been telling visual stories that resonate, inspire, and endure since our founding.";
-    const heroImageUrl = content.hero?.imageUrl || "https://images-pw.pixieset.com/site/gley00/5ylE7p/DSC_0042_030f432c_2048.jpg";
+    const heroImageUrl = content.hero?.imageUrl || "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=2000&auto=format&fit=crop&q=80";
 
     const missionTitle = content.mission?.title || "Our Mission";
     const missionText1 = content.mission?.text1 || "At RM Media Group JA, we believe every brand, every couple, and every individual has a unique story worth telling. Our mission is to capture those stories with honesty, artistry, and an unwavering commitment to quality.";
@@ -90,30 +98,14 @@ export default async function AboutPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                        <img
-                            src="https://images-pw.pixieset.com/site/gley00/q8Ao74/DSCF1660_748f36ba_2048.jpg"
-                            alt="Creative Campaigns"
-                            referrerPolicy="no-referrer"
-                            className="w-full aspect-square object-cover rounded-sm"
-                        />
-                        <img
-                            src="https://images-pw.pixieset.com/site/gley00/5wRQ8j/DSCF2168_4361a427_2048.jpg"
-                            alt="Editorial Portrait"
-                            referrerPolicy="no-referrer"
-                            className="w-full aspect-square object-cover rounded-sm mt-8"
-                        />
-                        <img
-                            src="https://images-pw.pixieset.com/site/gley00/RmZpkj/DSCF3720_ec08a69b_2048.jpg"
-                            alt="Wedding Coverage"
-                            referrerPolicy="no-referrer"
-                            className="w-full aspect-square object-cover rounded-sm -mt-8"
-                        />
-                        <img
-                            src="https://images-pw.pixieset.com/site/gley00/LVO8vk/5f292c2483c306060c487f9e5792aa12_0fe73901_2048.JPG"
-                            alt="Lifestyle Session"
-                            referrerPolicy="no-referrer"
-                            className="w-full aspect-square object-cover rounded-sm"
-                        />
+                        {ABOUT_IMAGES.map((img, i) => (
+                            <img
+                                key={i}
+                                src={img.src}
+                                alt={img.alt}
+                                className={`w-full aspect-square object-cover rounded-sm ${i === 1 ? "mt-8" : i === 2 ? "-mt-8" : ""}`}
+                            />
+                        ))}
                     </div>
                 </div>
             </section>

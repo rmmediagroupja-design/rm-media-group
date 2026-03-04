@@ -11,51 +11,54 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
+// High-quality professional photography (CDN-reliable, no hotlinking restrictions)
+const HERO_IMAGE = "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=2000&auto=format&fit=crop&q=80";
+
+const SERVICES = [
+    {
+        icon: Camera,
+        title: "Photography",
+        desc: "Cinematic photography that captures every emotion — from intimate portraits to grand weddings.",
+        href: "/services#photography",
+    },
+    {
+        icon: Video,
+        title: "Videography",
+        desc: "Award-winning video production that transforms your story into a cinematic masterpiece.",
+        href: "/services#videography",
+    },
+    {
+        icon: Share2,
+        title: "Social Media",
+        desc: "Strategic content creation and management that builds brand presence across all platforms.",
+        href: "/services#social",
+    },
+];
+
+const STATS = [
+    { value: "500+", label: "Projects Delivered" },
+    { value: "8+", label: "Years of Excellence" },
+    { value: "100%", label: "Client Satisfaction" },
+    { value: "50+", label: "Luxury Weddings" },
+];
+
+const PORTFOLIO_TEASER = [
+    { src: "https://images.unsplash.com/photo-1520854221256-17451cc331bf?w=1200&auto=format&fit=crop&q=80", alt: "Luxury Wedding" },
+    { src: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=1200&auto=format&fit=crop&q=80", alt: "Editorial Portrait" },
+    { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&auto=format&fit=crop&q=80", alt: "Wedding Coverage" },
+    { src: "https://images.unsplash.com/photo-1469371670807-013ccf25f16a?w=1200&auto=format&fit=crop&q=80", alt: "Destination Wedding" },
+    { src: "https://images.unsplash.com/photo-1551854838-212c50b4c184?w=1200&auto=format&fit=crop&q=80", alt: "Creative Campaigns" },
+    { src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200&auto=format&fit=crop&q=80", alt: "Commercial Shots" },
+    { src: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=1200&auto=format&fit=crop&q=80", alt: "Event Coverage" },
+];
+
 export default async function HomePage() {
     const settings = await getSiteSettings();
     const content = await getPageContent("home");
 
     const heroTitle = content.hero?.title || "Photography is,Poetry.";
     const heroSubtitle = content.hero?.subtitle || "Jamaica's premier photography, videography, and social media agency — crafting cinematic moments that last a lifetime.";
-    const heroImageUrl = content.hero?.imageUrl || "https://images-pw.pixieset.com/site/gley00/yQAy6Z/DSCF2058_e1baadd3_2048.jpg";
-
-    const SERVICES = [
-        {
-            icon: Camera,
-            title: "Photography",
-            desc: "Cinematic photography that captures every emotion — from intimate portraits to grand weddings.",
-            href: "/services#photography",
-        },
-        {
-            icon: Video,
-            title: "Videography",
-            desc: "Award-winning video production that transforms your story into a cinematic masterpiece.",
-            href: "/services#videography",
-        },
-        {
-            icon: Share2,
-            title: "Social Media",
-            desc: "Strategic content creation and management that builds brand presence across all platforms.",
-            href: "/services#social",
-        },
-    ];
-
-    const STATS = [
-        { value: "500+", label: "Projects Delivered" },
-        { value: "8+", label: "Years of Excellence" },
-        { value: "100%", label: "Client Satisfaction" },
-        { value: "50+", label: "Luxury Weddings" },
-    ];
-
-    const PORTFOLIO_TEASER = [
-        { src: "https://images-pw.pixieset.com/site/gley00/RmZpkj/DSCF3720_ec08a69b_2048.jpg", alt: "Capturing Moments" },
-        { src: "https://images-pw.pixieset.com/site/gley00/LVO8vk/5f292c2483c306060c487f9e5792aa12_0fe73901_2048.JPG", alt: "Lifestyle Beauty" },
-        { src: "https://images-pw.pixieset.com/site/gley00/5wRQ8j/DSCF2168_4361a427_2048.jpg", alt: "Editorial Portraits" },
-        { src: "https://images-pw.pixieset.com/site/gley00/baXAGz/1713844791402_515c6beb_2048.jpg", alt: "Studio Sessions" },
-        { src: "https://images-pw.pixieset.com/site/gley00/q8Ao74/DSCF1660_748f36ba_2048.jpg", alt: "Creative Campaigns" },
-        { src: "https://images-pw.pixieset.com/site/gley00/5ylE7p/DSC_0042_030f432c_2048.jpg", alt: "Commercial Shots" },
-        { src: "https://images-pw.pixieset.com/site/gley00/baXAy8/1713891797477_dda9b5a5_2048.jpg", alt: "Event Coverage" },
-    ];
+    const heroImageUrl = content.hero?.imageUrl || HERO_IMAGE;
 
     return (
         <>
@@ -210,7 +213,6 @@ export default async function HomePage() {
                                     <img
                                         src={img.src}
                                         alt={img.alt}
-                                        referrerPolicy="no-referrer"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
