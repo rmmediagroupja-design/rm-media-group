@@ -210,6 +210,7 @@ export default async function HomePage() {
                                     <img
                                         src={img.src}
                                         alt={img.alt}
+                                        referrerPolicy="no-referrer"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">

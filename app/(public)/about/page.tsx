@@ -93,21 +93,25 @@ export default async function AboutPage() {
                         <img
                             src="https://images-pw.pixieset.com/site/gley00/q8Ao74/DSCF1660_748f36ba_2048.jpg"
                             alt="Creative Campaigns"
+                            referrerPolicy="no-referrer"
                             className="w-full aspect-square object-cover rounded-sm"
                         />
                         <img
                             src="https://images-pw.pixieset.com/site/gley00/5wRQ8j/DSCF2168_4361a427_2048.jpg"
                             alt="Editorial Portrait"
+                            referrerPolicy="no-referrer"
                             className="w-full aspect-square object-cover rounded-sm mt-8"
                         />
                         <img
                             src="https://images-pw.pixieset.com/site/gley00/RmZpkj/DSCF3720_ec08a69b_2048.jpg"
                             alt="Wedding Coverage"
+                            referrerPolicy="no-referrer"
                             className="w-full aspect-square object-cover rounded-sm -mt-8"
                         />
                         <img
                             src="https://images-pw.pixieset.com/site/gley00/LVO8vk/5f292c2483c306060c487f9e5792aa12_0fe73901_2048.JPG"
                             alt="Lifestyle Session"
+                            referrerPolicy="no-referrer"
                             className="w-full aspect-square object-cover rounded-sm"
                         />
                     </div>
