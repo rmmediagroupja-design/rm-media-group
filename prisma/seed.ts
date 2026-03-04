@@ -120,6 +120,77 @@ async function main() {
         console.log("✅ Sample marketing client created.");
     }
 
+    // ─── Site Settings ────────────────────────────────────────────────────────
+    const settingsExists = await prisma.siteSettings.findUnique({ where: { id: "default" } });
+    if (!settingsExists) {
+        await prisma.siteSettings.create({
+            data: {
+                id: "default",
+                siteName: "RM Media Group JA",
+                contactEmail: "info@rmmediagroupja.art",
+                contactPhone: "+1 (876) 555-0199",
+                instagram: "https://instagram.com/rmmediagroupja",
+            },
+        });
+        console.log("✅ Site settings initialized.");
+    }
+
+    // ─── Site Content (Home) ──────────────────────────────────────────────────
+    const homeContentCount = await prisma.siteContent.count({ where: { page: "home" } });
+    if (homeContentCount === 0) {
+        await prisma.siteContent.createMany({
+            data: [
+                {
+                    page: "home",
+                    section: "hero",
+                    key: "title",
+                    content: "Photography is,Poetry.",
+                },
+                {
+                    page: "home",
+                    section: "hero",
+                    key: "subtitle",
+                    content: "Jamaica's premier photography, videography, and social media agency — crafting cinematic moments that last a lifetime.",
+                },
+                {
+                    page: "home",
+                    section: "hero",
+                    key: "imageUrl",
+                    content: "https://images-pw.pixieset.com/site/gley00/yQAy6Z/DSCF2058_e1baadd3_2048.jpg",
+                },
+            ],
+        });
+        console.log("✅ Home content initialized.");
+    }
+
+    // ─── Site Content (About) ─────────────────────────────────────────────────
+    const aboutContentCount = await prisma.siteContent.count({ where: { page: "about" } });
+    if (aboutContentCount === 0) {
+        await prisma.siteContent.createMany({
+            data: [
+                {
+                    page: "about",
+                    section: "hero",
+                    key: "title",
+                    content: "Behind The Lens",
+                },
+                {
+                    page: "about",
+                    section: "hero",
+                    key: "subtitle",
+                    content: "Born in Jamaica, built on passion. RM Media Group JA has been telling visual stories that resonate, inspire, and endure.",
+                },
+                {
+                    page: "about",
+                    section: "hero",
+                    key: "imageUrl",
+                    content: "https://images-pw.pixieset.com/site/gley00/5ylE7p/DSC_0042_030f432c_2048.jpg",
+                },
+            ],
+        });
+        console.log("✅ About content initialized.");
+    }
+
     console.log("✅ Database seeded successfully!");
 }
 
