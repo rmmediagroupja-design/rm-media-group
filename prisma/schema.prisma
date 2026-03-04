@@ -1,0 +1,508 @@
+// RM Media Group JA — Prisma Schema
+// PostgreSQL database with all business entities
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  STAFF
+  CLIENT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  BOOKED
+  COMPLETED
+  LOST
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ServiceType {
+  PHOTOGRAPHY
+  VIDEOGRAPHY
+  SOCIAL_MEDIA
+  WEDDING
+  CORPORATE
+  PORTRAIT
+  COMMERCIAL
+  OTHER
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum InvoiceStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum MarketingPackage {
+  BASIC
+  STANDARD
+  PREMIUM
+  CUSTOM
+}
+
+enum ContentStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  SCHEDULED
+  POSTED
+}
+
+// ─── Core Models ─────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @default(cuid())
+  name           String
+  email          String    @unique
+  password       String
+  role           Role      @default(CLIENT)
+  image          String?
+  emailVerified  DateTime?
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  client         Client?
+  marketingClients MarketingClient[]
+
+  @@map("users")
+  @@index([email])
+  @@index([role])
+}
+
+model Client {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Contact info
+  phone       String?
+  company     String?
+  address     String?
+  city        String?
+  country     String    @default("Jamaica")
+  notes       String?
+  
+  // Timestamps
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  lead        Lead?
+  bookings    Booking[]
+  galleries   Gallery[]
+  quotes      Quote[]
+  invoices    Invoice[]
+  projects    Project[]
+
+  @@map("clients")
+  @@index([userId])
+}
+
+// ─── Lead / CRM ──────────────────────────────────────────────────────────────
+
+model Lead {
+  id          String     @id @default(cuid())
+  
+  // Contact info (before becoming a client)
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  source      String?    // "contact_form" | "booking_form" | "referral" | "social"
+  
+  // Pipeline
+  status      LeadStatus @default(NEW)
+  serviceInterest ServiceType?
+  budget      Float?
+  eventDate   DateTime?
+  message     String?
+  
+  // Conversion
+  convertedAt DateTime?
+  clientId    String?    @unique
+  client      Client?    @relation(fields: [clientId], references: [id])
+  
+  // Notes
+  notes       LeadNote[]
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("leads")
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@map("lead_notes")
+  @@index([leadId])
+}
+
+// ─── Projects & Bookings ─────────────────────────────────────────────────────
+
+model Project {
+  id          String      @id @default(cuid())
+  clientId    String
+  client      Client      @relation(fields: [clientId], references: [id])
+  name        String
+  description String?
+  serviceType ServiceType
+  status      BookingStatus @default(PENDING)
+  startDate   DateTime?
+  endDate     DateTime?
+  totalValue  Float       @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  bookings    Booking[]
+  invoices    Invoice[]
+
+  @@map("projects")
+  @@index([clientId])
+  @@index([status])
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id])
+  
+  title       String
+  description String?
+  serviceType ServiceType
+  status      BookingStatus @default(PENDING)
+  
+  // Schedule
+  shootDate   DateTime
+  shootEndDate DateTime?
+  location    String?
+  
+  // Financials
+  depositPaid Boolean   @default(false)
+  depositAmount Float?
+  totalAmount   Float?
+  
+  notes       String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("bookings")
+  @@index([clientId])
+  @@index([shootDate])
+  @@index([status])
+}
+
+// ─── Quotes & Invoices ────────────────────────────────────────────────────────
+
+model Quote {
+  id          String      @id @default(cuid())
+  quoteNumber String      @unique
+  clientId    String
+  client      Client      @relation(fields: [clientId], references: [id])
+  
+  status      QuoteStatus @default(DRAFT)
+  
+  title       String
+  description String?
+  
+  // Financials
+  subtotal    Float       @default(0)
+  taxRate     Float       @default(0)    // percentage e.g. 15
+  tax         Float       @default(0)
+  discount    Float       @default(0)
+  total       Float       @default(0)
+  
+  // Validity
+  validUntil  DateTime?
+  
+  // Tracking
+  sentAt      DateTime?
+  approvedAt  DateTime?
+  rejectedAt  DateTime?
+  notes       String?
+  
+  // Relations
+  items       QuoteItem[]
+  invoice     Invoice?
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("quotes")
+  @@index([clientId])
+  @@index([status])
+  @@index([quoteNumber])
+}
+
+model QuoteItem {
+  id          String   @id @default(cuid())
+  quoteId     String
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  total       Float
+
+  @@map("quote_items")
+  @@index([quoteId])
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String        @unique
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id])
+  projectId     String?
+  project       Project?      @relation(fields: [projectId], references: [id])
+  quoteId       String?       @unique
+  quote         Quote?        @relation(fields: [quoteId], references: [id])
+  
+  status        InvoiceStatus @default(UNPAID)
+  
+  title         String
+  description   String?
+  
+  // Financials
+  subtotal      Float         @default(0)
+  taxRate       Float         @default(0)
+  tax           Float         @default(0)
+  discount      Float         @default(0)
+  total         Float         @default(0)
+  amountPaid    Float         @default(0)
+  
+  // Dates
+  dueDate       DateTime
+  paidAt        DateTime?
+  
+  // Reminders
+  lastReminderAt DateTime?
+  notes          String?
+  
+  // Relations
+  items         InvoiceItem[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("invoices")
+  @@index([clientId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([invoiceNumber])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  description String
+  quantity    Float    @default(1)
+  unitPrice   Float
+  total       Float
+
+  @@map("invoice_items")
+  @@index([invoiceId])
+}
+
+// ─── Client Galleries ─────────────────────────────────────────────────────────
+
+model Gallery {
+  id          String    @id @default(cuid())
+  clientId    String
+  client      Client    @relation(fields: [clientId], references: [id])
+  
+  name        String
+  description String?
+  
+  // Access control
+  password    String?   // hashed
+  isPublic    Boolean   @default(false)
+  expiresAt   DateTime?
+  
+  // Settings
+  allowDownload Boolean @default(true)
+  coverImageId  String?
+  
+  // Files
+  files       GalleryFile[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("galleries")
+  @@index([clientId])
+}
+
+model GalleryFile {
+  id          String   @id @default(cuid())
+  galleryId   String
+  gallery     Gallery  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  
+  filename    String   // original filename
+  storedName  String   // UUID-based stored filename
+  path        String   // relative path in storage
+  mimeType    String
+  size        Int      // bytes
+  width       Int?
+  height      Int?
+  thumbnail   String?  // path to thumbnail
+  
+  sortOrder   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+
+  @@map("gallery_files")
+  @@index([galleryId])
+}
+
+// ─── Social Media / Marketing ─────────────────────────────────────────────────
+
+model MarketingClient {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  
+  businessName String
+  contactName  String?
+  email        String
+  phone        String?
+  
+  // Package
+  package      MarketingPackage @default(BASIC)
+  monthlyFee   Float
+  startDate    DateTime
+  renewalDate  DateTime?
+  active       Boolean          @default(true)
+  
+  // Platforms
+  instagram    String?
+  facebook     String?
+  tiktok       String?
+  twitter      String?
+  youtube      String?
+  
+  notes        String?
+  
+  // Relations
+  content      MarketingContent[]
+  
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@map("marketing_clients")
+  @@index([userId])
+  @@index([active])
+}
+
+model MarketingContent {
+  id                String         @id @default(cuid())
+  marketingClientId String
+  marketingClient   MarketingClient @relation(fields: [marketingClientId], references: [id], onDelete: Cascade)
+  
+  title       String
+  caption     String?
+  platform    String         // instagram | facebook | tiktok | twitter | youtube
+  status      ContentStatus  @default(DRAFT)
+  
+  // Files
+  fileUrls    String[]       // stored file paths
+  
+  // Schedule
+  scheduledFor DateTime?
+  postedAt    DateTime?
+  
+  // Performance
+  likes       Int?
+  comments    Int?
+  reach       Int?
+  impressions Int?
+  
+  notes       String?
+  
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("marketing_content")
+  @@index([marketingClientId])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+// ─── CMS / Site Configuration ───────────────────────────────────────────────
+
+model SiteSettings {
+  id            String   @id @default("default")
+  siteName      String   @default("RM Media Group JA")
+  contactEmail  String?
+  contactPhone  String?
+  address       String?
+  logoUrl       String?
+  faviconUrl    String?
+  
+  // Social links
+  instagram     String?
+  facebook      String?
+  youtube       String?
+  
+  updatedAt     DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  page      String   // "home", "about", "services", "contact"
+  section   String   // "hero", "stats", "features", etc.
+  key       String   // unique key within the page/section
+  content   Json     // stores the content (text, image URLs, arrays, etc.)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([page, section, key])
+  @@map("site_content")
+  @@index([page])
+}
