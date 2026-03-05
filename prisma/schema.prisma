@@ -506,3 +506,33 @@ model SiteContent {
   @@map("site_content")
   @@index([page])
 }
+
+// ─── Visual Block Builder ───────────────────────────────────────────────────
+
+model Page {
+  id          String       @id @default(cuid())
+  slug        String       @unique // e.g., "home", "weddings", "about"
+  title       String       // e.g., "Weddings Portfolio"
+  description String?      // SEO meta description
+  blocks      PageBlock[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("pages")
+}
+
+model PageBlock {
+  id        String   @id @default(cuid())
+  pageId    String
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      String   // "HERO", "GALLERY_GRID", "TEXT_IMAGE", "TEXT"
+  order     Int      // To handle drag-and-drop vertical ordering
+  content   Json     // Standardized JSON based on block type (e.g., { title: "", images: [] })
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("page_blocks")
+  @@index([pageId])
+  @@index([order])
+}
