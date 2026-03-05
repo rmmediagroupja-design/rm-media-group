@@ -4,15 +4,16 @@ import { BlockRenderer } from "@/components/public/BlockRenderer";
 import type { Metadata } from "next";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 // Generate metadata dynamically from the page description
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const { slug } = await params;
     const page = await prisma.page.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
         select: { title: true, description: true }
     });
 
@@ -25,8 +26,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DynamicPublicPage({ params }: PageProps) {
+    const { slug } = await params;
     const page = await prisma.page.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
         include: {
             blocks: {
                 orderBy: { order: "asc" }

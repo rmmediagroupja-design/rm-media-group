@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import {
     Save, Plus, Trash2, ArrowUp, ArrowDown, Settings2,
     Type, Image as ImageIcon, LayoutGrid, Maximize2,
-    ChevronLeft, Loader2, Sparkles, Wand2
+    ChevronLeft, Loader2, Sparkles, Wand2, X
 } from "lucide-react";
 import Link from "next/link";
 import { ImageUploader } from "@/components/admin/ImageUploader";
@@ -163,8 +163,8 @@ export default function PageBuilderStudio() {
                                 key={index}
                                 onClick={() => setActiveBlock(index)}
                                 className={`relative group transition-all duration-300 rounded-lg cursor-pointer animate-in fade-in zoom-in-95 ${activeBlock === index
-                                        ? "ring-2 ring-[#00D2B9] ring-offset-4 ring-offset-[#141414] shadow-2xl shadow-[#00D2B9]/10"
-                                        : "hover:ring-1 hover:ring-[#333]"
+                                    ? "ring-2 ring-[#00D2B9] ring-offset-4 ring-offset-[#141414] shadow-2xl shadow-[#00D2B9]/10"
+                                    : "hover:ring-1 hover:ring-[#333]"
                                     }`}
                             >
                                 {/* Block Controls Overlay */}

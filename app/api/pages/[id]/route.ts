@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
     if (!session || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     try {
         const page = await prisma.page.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 blocks: {
                     orderBy: { order: 'asc' }
@@ -30,7 +31,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // Update Page and fully sync its Blocks
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
     if (!session || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +45,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         const updatedPage = await prisma.$transaction(async (tx) => {
             // 1. Update core page details
             await tx.page.update({
-                where: { id: params.id },
+                where: { id },
                 data: {
                     title: body.title,
                     description: body.description,
@@ -52,14 +54,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
             // 2. Wipe existing blocks for this page to replace them cleanly
             await tx.pageBlock.deleteMany({
-                where: { pageId: params.id }
+                where: { pageId: id }
             });
 
             // 3. Insert new blocks mapped to the correct page, maintaining order
             if (body.blocks && Array.isArray(body.blocks)) {
                 await tx.pageBlock.createMany({
                     data: body.blocks.map((b: any, index: number) => ({
-                        pageId: params.id,
+                        pageId: id,
                         type: b.type,
                         order: index, // Enforce vertical ordering
                         content: b.content || {}
@@ -69,7 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
             // Return the fresh state
             return await tx.page.findUnique({
-                where: { id: params.id },
+                where: { id },
                 include: { blocks: { orderBy: { order: 'asc' } } }
             });
         });
@@ -81,7 +83,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
     if (!session || (session.user.role !== "ADMIN" && session.user.role !== "STAFF")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -89,7 +92,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     try {
         await prisma.page.delete({
-            where: { id: params.id }
+            where: { id }
         });
         return new NextResponse(null, { status: 204 });
     } catch (error) {
