@@ -7,17 +7,17 @@ async function main() {
     console.log("🌱 Seeding database...");
 
     // ─── Admin user ───────────────────────────────────────────────────────────
-    const adminExists = await prisma.user.findUnique({ where: { email: "admin@rmmediagroup.com" } });
+    const adminExists = await prisma.user.findUnique({ where: { email: "rmmediagroupja@gmail.com" } });
     if (!adminExists) {
         await prisma.user.create({
             data: {
                 name: "RM Admin",
-                email: "admin@rmmediagroup.com",
+                email: "rmmediagroupja@gmail.com",
                 password: await bcrypt.hash("RMMedia2024!", 12),
                 role: "ADMIN",
             },
         });
-        console.log("✅ Admin user created: admin@rmmediagroup.com / RMMedia2024!");
+        console.log("✅ Admin user created: rmmediagroupja@gmail.com / RMMedia2024!");
     } else {
         console.log("ℹ️  Admin user already exists.");
     }
