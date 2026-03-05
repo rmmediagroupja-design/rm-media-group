@@ -7,20 +7,23 @@ async function main() {
     console.log("🌱 Seeding database...");
 
     // ─── Admin user ───────────────────────────────────────────────────────────
-    const adminExists = await prisma.user.findUnique({ where: { email: "rmmediagroupja@gmail.com" } });
-    if (!adminExists) {
-        await prisma.user.create({
-            data: {
-                name: "RM Admin",
-                email: "rmmediagroupja@gmail.com",
-                password: await bcrypt.hash("RMMedia2024!", 12),
-                role: "ADMIN",
-            },
-        });
-        console.log("✅ Admin user created: rmmediagroupja@gmail.com / RMMedia2024!");
-    } else {
-        console.log("ℹ️  Admin user already exists.");
-    }
+    const hashedPassword = await bcrypt.hash("RMMedia2024!", 12);
+    await prisma.user.upsert({
+        where: { email: "rmmediagroupja@gmail.com" },
+        update: {
+            password: hashedPassword,
+            role: "ADMIN",
+            active: true,
+        },
+        create: {
+            name: "RM Admin",
+            email: "rmmediagroupja@gmail.com",
+            password: hashedPassword,
+            role: "ADMIN",
+        },
+    });
+    console.log("✅ Admin user ready: rmmediagroupja@gmail.com / RMMedia2024!");
+
 
     // ─── Sample staff user ─────────────────────────────────────────────────────
     const staffExists = await prisma.user.findUnique({ where: { email: "staff@rmmediagroup.com" } });
