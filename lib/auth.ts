@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -11,7 +10,8 @@ const loginSchema = z.object({
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    adapter: PrismaAdapter(prisma) as any,
+    // NOTE: No PrismaAdapter — JWT + Credentials doesn't need one.
+    // The adapter causes a double-auth cycle that breaks login.
     session: { strategy: "jwt" },
     trustHost: true,
     pages: {
