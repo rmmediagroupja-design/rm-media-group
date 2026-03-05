@@ -19,6 +19,7 @@ const NAV_ITEMS = [
     { href: "/admin/galleries", label: "Galleries", icon: Image },
     { href: "/admin/marketing", label: "Marketing", icon: Share2 },
     { href: "/admin/finance", label: "Finance", icon: DollarSign },
+    { href: "/admin/pages", label: "Pages", icon: FileText },
     { href: "/admin/appearance", label: "Appearance", icon: Palette },
 ];
 
