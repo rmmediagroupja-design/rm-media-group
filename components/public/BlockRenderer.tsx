@@ -25,10 +25,10 @@ const HeroBlock = ({ content }: BlockProps) => (
                 className="text-6xl md:text-8xl font-bold text-white tracking-tight"
                 style={{ fontFamily: "var(--font-playfair), serif" }}
             >
-                {content.title}
+                {content.title || "Welcome"}
             </h1>
             <p className="text-[#a0a0a0] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-                {content.subtitle}
+                {content.subtitle || ""}
             </p>
             {content.buttonText && (
                 <div className="pt-8">
@@ -47,7 +47,7 @@ const TextBlock = ({ content }: BlockProps) => (
     <section className="py-24 max-w-3xl mx-auto px-6">
         <div
             className="text-[#888] text-lg md:text-xl leading-[1.8] font-serif italic text-center"
-            dangerouslySetInnerHTML={{ __html: content.body.replace(/\n/g, '<br/>') }}
+            dangerouslySetInnerHTML={{ __html: (content.body || "").replace(/\n/g, '<br/>') }}
         />
     </section>
 );
@@ -73,10 +73,10 @@ const TextImageBlock = ({ content }: BlockProps) => (
                     className="text-4xl md:text-6xl font-bold text-white mb-8"
                     style={{ fontFamily: "var(--font-playfair), serif" }}
                 >
-                    {content.title}
+                    {content.title || ""}
                 </h2>
                 <p className="text-[#666] text-lg leading-relaxed mb-10">
-                    {content.body}
+                    {content.body || ""}
                 </p>
             </div>
         </div>
@@ -121,9 +121,9 @@ const ContactFormBlock = ({ content }: BlockProps) => (
                 className="text-5xl font-bold text-white mb-6"
                 style={{ fontFamily: "var(--font-playfair), serif" }}
             >
-                {content.title}
+                {content.title || "Get in Touch"}
             </h2>
-            <p className="text-[#666] mb-12">{content.description}</p>
+            <p className="text-[#666] mb-12">{content.description || "We would love to hear from you."}</p>
             <Link href="/contact" className="btn-cyan mx-auto">
                 Begin Your Project
                 <ArrowRight size={18} />

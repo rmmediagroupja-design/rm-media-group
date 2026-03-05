@@ -13,11 +13,13 @@ import {
     Check
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { ImageUploader } from "@/components/admin/ImageUploader";
+import { useDebouncedCallback } from "use-debounce";
 
 type Tab = "general" | "home" | "about" | "services";
 
 export default function AppearancePage() {
-    const [activeTab, setActiveTab] = useState<Tab>("general");
+    const [activeTab, setActiveTab] = useState<Tab>("home");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState<any>({});
@@ -68,28 +70,36 @@ export default function AppearancePage() {
         }
     }
 
-    async function handleUpdateContent(section: string, key: string, value: any) {
+    const debouncedUpdateContent = useDebouncedCallback(
+        async (section: string, key: string, value: any) => {
+            try {
+                await fetch("/api/cms/content", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        page: activeTab,
+                        section,
+                        key,
+                        content: value
+                    }),
+                });
+            } catch (error) {
+                console.error("Failed to update content", error);
+                toast.error("Failed to update content");
+            }
+        },
+        1000
+    );
+
+    function handleUpdateContent(section: string, key: string, value: any) {
         // Optimistic UI update
         const newContent = { ...content };
         if (!newContent[section]) newContent[section] = {};
         newContent[section][key] = value;
         setContent(newContent);
 
-        try {
-            await fetch("/api/cms/content", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    page: activeTab,
-                    section,
-                    key,
-                    content: value
-                }),
-            });
-        } catch (error) {
-            console.error("Failed to update content", error);
-            toast.error("Failed to update content");
-        }
+        // Trigger debounced API call
+        debouncedUpdateContent(section, key, value);
     }
 
     async function handleUpdateArrayContent(field: string, value: any) {
@@ -180,36 +190,63 @@ export default function AppearancePage() {
                                 <Globe className="text-cyan" size={20} />
                                 Global Settings
                             </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Site Name</label>
+                                        <input
+                                            type="text"
+                                            className="input-luxury"
+                                            value={settings.siteName || ""}
+                                            onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
+                                            placeholder="RM Media Group JA"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Contact Email</label>
+                                        <input
+                                            type="email"
+                                            className="input-luxury"
+                                            value={settings.contactEmail || ""}
+                                            onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
+                                            placeholder="info@rmmedia.com"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Contact Phone</label>
+                                        <input
+                                            type="text"
+                                            className="input-luxury"
+                                            value={settings.contactPhone || ""}
+                                            onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Site Logo</label>
+                                        <ImageUploader
+                                            value={settings.logoUrl || ""}
+                                            onChange={(url) => setSettings({ ...settings, logoUrl: url })}
+                                            label="Upload Logo"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Favicon</label>
+                                        <ImageUploader
+                                            value={settings.faviconUrl || ""}
+                                            onChange={(url) => setSettings({ ...settings, faviconUrl: url })}
+                                            label="Upload Favicon"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="divider-cyan/20 my-8" />
+
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-4">Social Media Links</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-muted uppercase tracking-wider">Site Name</label>
-                                    <input
-                                        type="text"
-                                        className="input-luxury"
-                                        value={settings.siteName || ""}
-                                        onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                                        placeholder="RM Media Group JA"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-muted uppercase tracking-wider">Contact Email</label>
-                                    <input
-                                        type="email"
-                                        className="input-luxury"
-                                        value={settings.contactEmail || ""}
-                                        onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-                                        placeholder="info@rmmedia.com"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-semibold text-muted uppercase tracking-wider">Contact Phone</label>
-                                    <input
-                                        type="text"
-                                        className="input-luxury"
-                                        value={settings.contactPhone || ""}
-                                        onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
-                                    />
-                                </div>
                                 <div className="space-y-2">
                                     <label className="text-xs font-semibold text-muted uppercase tracking-wider">Instagram URL</label>
                                     <input
@@ -217,6 +254,27 @@ export default function AppearancePage() {
                                         className="input-luxury"
                                         value={settings.instagram || ""}
                                         onChange={(e) => setSettings({ ...settings, instagram: e.target.value })}
+                                        placeholder="https://instagram.com/..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-muted uppercase tracking-wider">Facebook URL</label>
+                                    <input
+                                        type="text"
+                                        className="input-luxury"
+                                        value={settings.facebook || ""}
+                                        onChange={(e) => setSettings({ ...settings, facebook: e.target.value })}
+                                        placeholder="https://facebook.com/..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-semibold text-muted uppercase tracking-wider">YouTube URL</label>
+                                    <input
+                                        type="text"
+                                        className="input-luxury"
+                                        value={settings.youtube || ""}
+                                        onChange={(e) => setSettings({ ...settings, youtube: e.target.value })}
+                                        placeholder="https://youtube.com/..."
                                     />
                                 </div>
                             </div>
@@ -251,12 +309,10 @@ export default function AppearancePage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Hero Image URL</label>
-                                        <input
-                                            type="text"
-                                            className="input-luxury"
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Hero Image</label>
+                                        <ImageUploader
                                             value={content.hero?.imageUrl || ""}
-                                            onChange={(e) => handleUpdateContent("hero", "imageUrl", e.target.value)}
+                                            onChange={(url) => handleUpdateContent("hero", "imageUrl", url)}
                                         />
                                     </div>
                                 </div>
@@ -291,12 +347,10 @@ export default function AppearancePage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Background Image URL</label>
-                                        <input
-                                            type="text"
-                                            className="input-luxury"
+                                        <label className="text-xs font-semibold text-muted uppercase tracking-wider">Background Image</label>
+                                        <ImageUploader
                                             value={content.hero?.imageUrl || ""}
-                                            onChange={(e) => handleUpdateContent("hero", "imageUrl", e.target.value)}
+                                            onChange={(url) => handleUpdateContent("hero", "imageUrl", url)}
                                         />
                                     </div>
                                 </div>

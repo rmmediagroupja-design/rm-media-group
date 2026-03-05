@@ -5,16 +5,16 @@ import { z } from "zod";
 
 const schema = z.object({
     businessName: z.string().min(1),
-    contactName: z.string().optional(),
-    contactEmail: z.string().email().optional(),
-    contactPhone: z.string().optional(),
+    contactName: z.string().nullish(),
+    contactEmail: z.string().email().nullish(),
+    contactPhone: z.string().nullish(),
     package: z.enum(["BASIC", "STANDARD", "PREMIUM", "CUSTOM"]).default("STANDARD"),
-    monthlyFee: z.number().min(0),
-    instagram: z.string().url().optional().or(z.literal("")),
-    facebook: z.string().url().optional().or(z.literal("")),
-    tiktok: z.string().url().optional().or(z.literal("")),
-    youtube: z.string().url().optional().or(z.literal("")),
-    notes: z.string().optional(),
+    monthlyFee: z.coerce.number().min(0),
+    instagram: z.string().nullish(),
+    facebook: z.string().nullish(),
+    tiktok: z.string().nullish(),
+    youtube: z.string().nullish(),
+    notes: z.string().nullish(),
 });
 
 export async function GET() {

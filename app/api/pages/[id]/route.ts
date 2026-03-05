@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     try {
-        const page = await prisma.page.findUnique({
+        const page = await (prisma as any).page.findUnique({
             where: { id },
             include: {
                 blocks: {
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         // Use a transaction to ensure all blocks are saved safely
         const updatedPage = await prisma.$transaction(async (tx) => {
             // 1. Update core page details
-            await tx.page.update({
+            await (tx as any).page.update({
                 where: { id },
                 data: {
                     title: body.title,
@@ -53,13 +53,13 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             });
 
             // 2. Wipe existing blocks for this page to replace them cleanly
-            await tx.pageBlock.deleteMany({
+            await (tx as any).pageBlock.deleteMany({
                 where: { pageId: id }
             });
 
             // 3. Insert new blocks mapped to the correct page, maintaining order
             if (body.blocks && Array.isArray(body.blocks)) {
-                await tx.pageBlock.createMany({
+                await (tx as any).pageBlock.createMany({
                     data: body.blocks.map((b: any, index: number) => ({
                         pageId: id,
                         type: b.type,
@@ -70,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             }
 
             // Return the fresh state
-            return await tx.page.findUnique({
+            return await (tx as any).page.findUnique({
                 where: { id },
                 include: { blocks: { orderBy: { order: 'asc' } } }
             });
@@ -91,7 +91,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     try {
-        await prisma.page.delete({
+        await (prisma as any).page.delete({
             where: { id }
         });
         return new NextResponse(null, { status: 204 });

@@ -4,15 +4,15 @@ import { getSiteSettings, updateSiteSettings } from "@/lib/services/cmsService";
 import { z } from "zod";
 
 const settingsSchema = z.object({
-    siteName: z.string().optional(),
-    contactEmail: z.string().email().optional().or(z.literal("")),
-    contactPhone: z.string().optional(),
-    address: z.string().optional(),
-    logoUrl: z.string().url().optional().or(z.literal("")),
-    faviconUrl: z.string().url().optional().or(z.literal("")),
-    instagram: z.string().url().optional().or(z.literal("")),
-    facebook: z.string().url().optional().or(z.literal("")),
-    youtube: z.string().url().optional().or(z.literal("")),
+    siteName: z.string().nullish(),
+    contactEmail: z.string().nullish(),
+    contactPhone: z.string().nullish(),
+    address: z.string().nullish(),
+    logoUrl: z.string().nullish(),
+    faviconUrl: z.string().nullish(),
+    instagram: z.string().nullish(),
+    facebook: z.string().nullish(),
+    youtube: z.string().nullish(),
 });
 
 export async function GET() {

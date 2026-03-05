@@ -5,10 +5,10 @@ import { z } from "zod";
 
 const schema = z.object({
     name: z.string().min(1),
-    clientId: z.string().uuid(),
-    password: z.string().optional(),
-    allowDownload: z.boolean().optional(),
-    expiresAt: z.string().datetime().optional(),
+    clientId: z.string().min(1),
+    password: z.string().nullish(),
+    allowDownload: z.boolean().nullish(),
+    expiresAt: z.string().nullish(),
 });
 
 export async function GET() {
